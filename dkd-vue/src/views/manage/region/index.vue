@@ -65,6 +65,7 @@
       <el-table-column label="备注说明" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
+          <el-button link type="primary" @click="getRegionInfo(scope.row)" v-hasPermi="['manage:node:list']">查看详情</el-button>
           <el-button link type="primary" @click="handleUpdate(scope.row)" v-hasPermi="['manage:region:edit']">修改</el-button>
           <el-button link type="primary" @click="handleDelete(scope.row)" v-hasPermi="['manage:region:remove']">删除</el-button>
         </template>
@@ -96,11 +97,26 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 查看详情对话框 -->
+    <el-dialog title="区域详情" v-model="regionInfoOpen" width="500px" append-to-body>
+      <el-form-item label="区域名称" prop="regionName">
+        <el-input v-model="form.regionName" disabled />
+      </el-form-item>
+      <label>包含点位：</label>
+      <el-table :data="nodeList">
+        <el-table-column label="序号" type="index" width="50" align="center" />
+        <el-table-column label="点位名称" align="center" prop="nodeName" />
+        <el-table-column label="设备数量" align="center" prop="vmCount" />
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Region">
 import { listRegion, getRegion, delRegion, addRegion, updateRegion } from "@/api/manage/region";
+import { listNode } from "@/api/manage/node";
+import { loadAllParams } from "@/api/page";
 
 const { proxy } = getCurrentInstance();
 
@@ -113,6 +129,8 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
+const nodeList = ref([]);
+const regionInfoOpen = ref(false);
 
 const data = reactive({
   form: {},
@@ -237,6 +255,20 @@ function handleExport() {
   proxy.download('manage/region/export', {
     ...queryParams.value
   }, `region_${new Date().getTime()}.xlsx`)
+}
+
+/** 查看详情按钮操作 */
+function getRegionInfo(row) {
+  reset();
+  const _id = row.id;
+  getRegion(_id).then(response => {
+    form.value = response.data;
+  });
+  loadAllParams.regionId = row.id;
+  listNode(loadAllParams).then(response => {
+    nodeList.value = response.rows;
+  });
+  regionInfoOpen.value = true;
 }
 
 getList();

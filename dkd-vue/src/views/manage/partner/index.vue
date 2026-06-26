@@ -70,6 +70,7 @@
       <el-table-column label="联系电话" align="center" prop="contactPhone" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300px">
         <template #default="scope">
+          <el-button link type="primary" @click="resetPwd(scope.row)" v-hasPermi="['manage:partner:edit']">重置密码</el-button>
           <el-button link type="primary" @click="getPartnerInfo(scope.row)" v-hasPermi="['manage:partner:query']">查看详情</el-button>
           <el-button link type="primary" @click="handleUpdate(scope.row)" v-hasPermi="['manage:partner:edit']">修改</el-button>
           <el-button link type="primary" @click="handleDelete(scope.row)" v-hasPermi="['manage:partner:remove']">删除</el-button>
@@ -131,7 +132,7 @@
 </template>
 
 <script setup name="Partner">
-import { listPartner, getPartner, delPartner, addPartner, updatePartner } from "@/api/manage/partner";
+import { listPartner, getPartner, delPartner, addPartner, updatePartner, resetPartnerPwd } from "@/api/manage/partner";
 
 const { proxy } = getCurrentInstance();
 
@@ -296,6 +297,15 @@ function getPartnerInfo(row) {
     form.value = response.data;
     partnerInfoOpen.value = true;
   });
+}
+
+/* 重置合作商密码 */
+function resetPwd(row) {
+  proxy.$modal.confirm('你确定要重置该合作商密码吗？').then(function () {
+    return resetPartnerPwd(row.id);
+  }).then(() => {
+    proxy.$modal.msgSuccess("重置成功");
+  }).catch(() => { });
 }
 
 getList();
