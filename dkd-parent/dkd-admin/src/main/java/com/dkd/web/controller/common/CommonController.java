@@ -17,9 +17,8 @@ import com.dkd.common.config.RuoYiConfig;
 import com.dkd.common.constant.Constants;
 import com.dkd.common.core.domain.AjaxResult;
 import com.dkd.common.utils.StringUtils;
-import com.dkd.common.utils.file.FileUploadUtils;
 import com.dkd.common.utils.file.FileUtils;
-import com.dkd.framework.config.ServerConfig;
+import com.dkd.common.utils.file.MinioUtils;
 
 /**
  * 通用请求处理
@@ -33,7 +32,7 @@ public class CommonController
     private static final Logger log = LoggerFactory.getLogger(CommonController.class);
 
     @Autowired
-    private ServerConfig serverConfig;
+    private MinioUtils minioUtils;
 
     private static final String FILE_DELIMETER = ",";
 
@@ -77,15 +76,12 @@ public class CommonController
     {
         try
         {
-            // 上传文件路径
-            String filePath = RuoYiConfig.getUploadPath();
-            // 上传并返回新文件名称
-            String fileName = FileUploadUtils.upload(filePath, file);
-            String url = serverConfig.getUrl() + fileName;
+            // 上传文件到MinIO
+            String url = minioUtils.upload(file);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("url", url);
-            ajax.put("fileName", fileName);
-            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("fileName", url);
+            ajax.put("newFileName", url.substring(url.lastIndexOf("/") + 1));
             ajax.put("originalFilename", file.getOriginalFilename());
             return ajax;
         }
@@ -103,20 +99,17 @@ public class CommonController
     {
         try
         {
-            // 上传文件路径
-            String filePath = RuoYiConfig.getUploadPath();
             List<String> urls = new ArrayList<String>();
             List<String> fileNames = new ArrayList<String>();
             List<String> newFileNames = new ArrayList<String>();
             List<String> originalFilenames = new ArrayList<String>();
             for (MultipartFile file : files)
             {
-                // 上传并返回新文件名称
-                String fileName = FileUploadUtils.upload(filePath, file);
-                String url = serverConfig.getUrl() + fileName;
+                // 上传文件到MinIO
+                String url = minioUtils.upload(file);
                 urls.add(url);
-                fileNames.add(fileName);
-                newFileNames.add(FileUtils.getName(fileName));
+                fileNames.add(url);
+                newFileNames.add(url.substring(url.lastIndexOf("/") + 1));
                 originalFilenames.add(file.getOriginalFilename());
             }
             AjaxResult ajax = AjaxResult.success();

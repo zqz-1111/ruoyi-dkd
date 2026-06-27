@@ -3,9 +3,7 @@ package com.dkd.manage.domain.vo;
 import com.dkd.manage.domain.Node;
 import com.dkd.manage.domain.Partner;
 import com.dkd.manage.domain.Region;
-import lombok.Data;
 
-@Data
 public class NodeVo extends Node {
 
     // 设备数量
@@ -16,4 +14,28 @@ public class NodeVo extends Node {
 
     // 合作商
     private Partner partner;
+
+    public int getVmCount() {
+        return vmCount;
+    }
+
+    public void setVmCount(int vmCount) {
+        this.vmCount = vmCount;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
 }
