@@ -78,6 +78,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" @click="handleUpdate(scope.row)" v-hasPermi="['manage:vm:edit']">修改</el-button>
+          <el-button link type="primary" @click="handleUpdatePolicy(scope.row)" v-hasPermi="['manage:vm:edit']">策略</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -138,6 +139,23 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 策略管理对话框 -->
+    <el-dialog title="策略管理" v-model="policyOpen" width="500px" append-to-body>
+      <el-form ref="vmRef" :model="form" label-width="80px">
+        <el-form-item label="策略" prop="policyId">
+          <el-select v-model="form.policyId" placeholder="请选择策略">
+            <el-option v-for="item in policyList" :key="item.policyId" :label="item.policyName" :value="item.policyId" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -147,6 +165,7 @@ import { listVmType } from "@/api/manage/vmType";
 import { listPartner } from "@/api/manage/partner";
 import { listNode } from "@/api/manage/node";
 import { listRegion } from "@/api/manage/region";
+import { listPolicy } from "@/api/manage/policy";
 import { loadAllParams } from "@/api/page";
 
 const { proxy } = getCurrentInstance();
@@ -190,6 +209,17 @@ function getRegionList() {
   });
 }
 
+const policyList = ref([]);
+const policyOpen = ref(false);
+function handleUpdatePolicy(row) {
+  form.value.id = row.id;
+  form.value.policyId = row.policyId;
+  listPolicy(loadAllParams).then(response => {
+    policyList.value = response.rows;
+    policyOpen.value = true;
+  });
+}
+
 getRegionList();
 getPartnerList();
 getNodeList();
@@ -227,6 +257,7 @@ function getList() {
 // 取消按钮
 function cancel() {
   open.value = false;
+  policyOpen.value = false;
   reset();
 }
 
