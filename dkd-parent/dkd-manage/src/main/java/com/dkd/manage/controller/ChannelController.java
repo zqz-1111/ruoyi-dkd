@@ -17,6 +17,7 @@ import com.dkd.common.core.controller.BaseController;
 import com.dkd.common.core.domain.AjaxResult;
 import com.dkd.common.enums.BusinessType;
 import com.dkd.manage.domain.Channel;
+import com.dkd.manage.domain.dto.ChannelConfigDto;
 import com.dkd.manage.service.IChannelService;
 import com.dkd.common.utils.poi.ExcelUtil;
 import com.dkd.common.core.page.TableDataInfo;
@@ -100,5 +101,15 @@ public class ChannelController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(channelService.deleteChannelByIds(ids));
+    }
+
+    /**
+     * 货道关联商品
+     */
+    @PreAuthorize("@ss.hasPermi('manage:channel:edit')")
+    @Log(title = "售货机货道", businessType = BusinessType.UPDATE)
+    @PutMapping("/config")
+    public AjaxResult setChannel(@RequestBody ChannelConfigDto channelConfigDto) {
+        return toAjax(channelService.setChannel(channelConfigDto));
     }
 }
