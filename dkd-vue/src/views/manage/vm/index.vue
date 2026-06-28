@@ -79,6 +79,7 @@
         <template #default="scope">
           <el-button link type="primary" @click="handleUpdate(scope.row)" v-hasPermi="['manage:vm:edit']">修改</el-button>
           <el-button link type="primary" @click="handleUpdatePolicy(scope.row)" v-hasPermi="['manage:vm:edit']">策略</el-button>
+          <el-button link type="primary" @click="handleGoods(scope.row)" v-hasPermi="['manage:vm:edit']">货道</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -156,6 +157,9 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 货道组件 -->
+    <ChannelDialog :goodVisible="goodVisible" :goodData="goodData" @handleCloseGood="handleCloseGood"></ChannelDialog>
   </div>
 </template>
 
@@ -167,6 +171,7 @@ import { listNode } from "@/api/manage/node";
 import { listRegion } from "@/api/manage/region";
 import { listPolicy } from "@/api/manage/policy";
 import { loadAllParams } from "@/api/page";
+import ChannelDialog from './components/ChannelDialog.vue';
 
 const { proxy } = getCurrentInstance();
 const { vm_status } = proxy.useDict('vm_status');
@@ -218,6 +223,17 @@ function handleUpdatePolicy(row) {
     policyList.value = response.rows;
     policyOpen.value = true;
   });
+}
+
+// 货道
+const goodVisible = ref(false);
+const goodData = ref({});
+function handleGoods(row) {
+  goodVisible.value = true;
+  goodData.value = row;
+}
+function handleCloseGood() {
+  goodVisible.value = false;
 }
 
 getRegionList();
@@ -364,3 +380,5 @@ function handleExport() {
 
 getList();
 </script>
+
+<style lang="scss" scoped src="./index.scss"></style>
