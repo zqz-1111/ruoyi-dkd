@@ -17,6 +17,7 @@ import com.dkd.common.core.controller.BaseController;
 import com.dkd.common.core.domain.AjaxResult;
 import com.dkd.common.enums.BusinessType;
 import com.dkd.manage.domain.Task;
+import com.dkd.manage.domain.dto.TaskDto;
 import com.dkd.manage.domain.vo.TaskVo;
 import com.dkd.manage.service.ITaskService;
 import com.dkd.common.utils.poi.ExcelUtil;
@@ -71,14 +72,16 @@ public class TaskController extends BaseController
     }
 
     /**
-     * 新增工单管理
+     * 新增工单
      */
     @PreAuthorize("@ss.hasPermi('manage:task:add')")
-    @Log(title = "工单管理", businessType = BusinessType.INSERT)
+    @Log(title = "工单", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody Task task)
+    public AjaxResult add(@RequestBody TaskDto taskDto)
     {
-        return toAjax(taskService.insertTask(task));
+        // 设置指派人（登录用户）id
+        taskDto.setAssignorId(getUserId());
+        return toAjax(taskService.insertTaskDto(taskDto));
     }
 
     /**
@@ -90,6 +93,16 @@ public class TaskController extends BaseController
     public AjaxResult edit(@RequestBody Task task)
     {
         return toAjax(taskService.updateTask(task));
+    }
+
+    /**
+     * 取消工单
+     */
+    @PreAuthorize("@ss.hasPermi('manage:task:edit')")
+    @Log(title = "工单", businessType = BusinessType.UPDATE)
+    @PutMapping("/cancel")
+    public AjaxResult cancelTask(@RequestBody Task task) {
+        return toAjax(taskService.cancelTask(task));
     }
 
     /**
