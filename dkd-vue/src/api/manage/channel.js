@@ -3,8 +3,9 @@ import request from '@/utils/request';
 // 查询货道列表
 export function getGoodsList(innerCode) {
   return request({
-    url: '/manage/channel/list/' + innerCode,
+    url: '/manage/channel/list',
     method: 'get',
+    params: { innerCode },
   });
 }
 // 查询设备类型

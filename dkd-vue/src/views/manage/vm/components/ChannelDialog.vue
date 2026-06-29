@@ -203,7 +203,7 @@ const visible = ref(false); //货道弹层显示隐藏
 const scrollStatus = ref('LEFT');
 const listLoading = ref(false);
 const vmType = ref({}); //获取货道基本信息
-const channels = ref({}); //货道数据
+const channels = ref([]); //货道数据
 const scroll = ref(null); //滚动条ref
 // 监听货道弹层显示/隐藏
 watch(
@@ -220,15 +220,25 @@ const handleGoodOpen = () => {
 };
 // 获取货道基本信息
 const getVmType = async () => {
-  const { data } = await getGoodsType(props.goodData.vmTypeId);
-  vmType.value = data;
+  try {
+    const { data } = await getGoodsType(props.goodData.vmTypeId);
+    vmType.value = data;
+  } catch (e) {
+    console.error('获取设备类型失败', e);
+  }
 };
 // 获取货道列表
 const channelList = async () => {
   listLoading.value = true;
-  const { data } = await getGoodsList(props.goodData.innerCode);
-  channels.value = data;
-  listLoading.value = false;
+  try {
+    const { data } = await getGoodsList(props.goodData.innerCode);
+    channels.value = data || [];
+  } catch (e) {
+    console.error('获取货道列表失败', e);
+    channels.value = [];
+  } finally {
+    listLoading.value = false;
+  }
 };
 const computedCurrentIndex = (vmRowIndex, vmColIndex) => {
   return (vmRowIndex - 1) * vmType.value.vmCol + vmColIndex - 1;

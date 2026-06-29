@@ -1,7 +1,7 @@
 <template>
   <div v-if="channel" class="item">
     <div class="code">
-      {{ channel.channelCode }}
+      {{ channel?.channelCode }}
     </div>
     <div class="sku">
       <img
