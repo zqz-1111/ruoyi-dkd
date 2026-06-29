@@ -54,7 +54,7 @@ public class VendingMachineServiceImpl implements IVendingMachineService
 
     /**
      * 查询设备管理列表
-     * 
+     *
      * @param vendingMachine 设备管理
      * @return 设备管理
      */
@@ -62,6 +62,17 @@ public class VendingMachineServiceImpl implements IVendingMachineService
     public List<VendingMachine> selectVendingMachineList(VendingMachine vendingMachine)
     {
         return vendingMachineMapper.selectVendingMachineList(vendingMachine);
+    }
+
+    /**
+     * 根据设备编号查询设备信息
+     *
+     * @param innerCode
+     * @return VendingMachine
+     */
+    @Override
+    public VendingMachine selectVendingMachineByInnerCode(String innerCode) {
+        return vendingMachineMapper.selectVendingMachineByInnerCode(innerCode);
     }
 
     /**

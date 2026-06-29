@@ -16,8 +16,11 @@ import com.dkd.common.annotation.Log;
 import com.dkd.common.core.controller.BaseController;
 import com.dkd.common.core.domain.AjaxResult;
 import com.dkd.common.enums.BusinessType;
+import com.dkd.common.constant.DkdContants;
 import com.dkd.manage.domain.Emp;
+import com.dkd.manage.domain.VendingMachine;
 import com.dkd.manage.service.IEmpService;
+import com.dkd.manage.service.IVendingMachineService;
 import com.dkd.common.utils.poi.ExcelUtil;
 import com.dkd.common.core.page.TableDataInfo;
 
@@ -34,6 +37,9 @@ public class EmpController extends BaseController
     @Autowired
     private IEmpService empService;
 
+    @Autowired
+    private IVendingMachineService vendingMachineService;
+
     /**
      * 查询人员列表列表
      */
@@ -44,6 +50,44 @@ public class EmpController extends BaseController
         startPage();
         List<Emp> list = empService.selectEmpList(emp);
         return getDataTable(list);
+    }
+
+    /**
+     * 根据售货机获取运营人员列表
+     */
+    @PreAuthorize("@ss.hasPermi('manage:emp:list')")
+    @GetMapping("/businessList/{innerCode}")
+    public AjaxResult businessList(@PathVariable("innerCode") String innerCode) {
+        // 1.查询售货机信息
+        VendingMachine vm = vendingMachineService.selectVendingMachineByInnerCode(innerCode);
+        if (vm == null) {
+            return error();
+        }
+        // 2.根据区域id、角色编号、员工状态查询运营人员列表
+        Emp empParam = new Emp();
+        empParam.setRegionId(vm.getRegionId());// 设备所属区域
+        empParam.setStatus(DkdContants.EMP_STATUS_NORMAL);// 员工启用
+        empParam.setRoleCode(DkdContants.ROLE_CODE_BUSINESS);// 角色编码：运营员
+        return success(empService.selectEmpList(empParam));
+    }
+
+    /**
+     * 根据售货机获取运维人员列表
+     */
+    @PreAuthorize("@ss.hasPermi('manage:emp:list')")
+    @GetMapping("/operationList/{innerCode}")
+    public AjaxResult getOperationList(@PathVariable("innerCode") String innerCode) {
+        // 1.查询售货机信息
+        VendingMachine vm = vendingMachineService.selectVendingMachineByInnerCode(innerCode);
+        if (vm == null) {
+            return error("售货机不存在");
+        }
+        // 2.根据区域id、角色编号、状态查询运维人员列表
+        Emp empParam = new Emp();
+        empParam.setRegionId(vm.getRegionId());// 设备所属区域
+        empParam.setStatus(DkdContants.EMP_STATUS_NORMAL);// 员工启用
+        empParam.setRoleCode(DkdContants.ROLE_CODE_OPERATOR);// 角色编码：维修员
+        return success(empService.selectEmpList(empParam));
     }
 
     /**

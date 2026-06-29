@@ -2,6 +2,7 @@ package com.dkd.manage.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import com.dkd.common.core.domain.AjaxResult;
 import com.dkd.common.enums.BusinessType;
 import com.dkd.manage.domain.Channel;
 import com.dkd.manage.domain.dto.ChannelConfigDto;
+import com.dkd.manage.domain.vo.ChannelVo;
 import com.dkd.manage.service.IChannelService;
 import com.dkd.common.utils.poi.ExcelUtil;
 import com.dkd.common.core.page.TableDataInfo;
@@ -40,11 +42,17 @@ public class ChannelController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('manage:channel:list')")
     @GetMapping("/list")
-    public TableDataInfo list(Channel channel)
+    public AjaxResult list(Channel channel)
     {
+        // 根据售货机编号查询货道列表（带商品信息）
+        if (StringUtils.isNotBlank(channel.getInnerCode())) {
+            List<ChannelVo> list = channelService.selectChannelVoListByInnerCode(channel.getInnerCode());
+            return success(list);
+        }
+        // 默认查询
         startPage();
         List<Channel> list = channelService.selectChannelList(channel);
-        return getDataTable(list);
+        return success(getDataTable(list));
     }
 
     /**

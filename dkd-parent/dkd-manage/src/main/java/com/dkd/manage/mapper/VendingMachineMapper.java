@@ -1,6 +1,8 @@
 package com.dkd.manage.mapper;
 
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import com.dkd.manage.domain.VendingMachine;
 
 /**
@@ -21,11 +23,20 @@ public interface VendingMachineMapper
 
     /**
      * 查询设备管理列表
-     * 
+     *
      * @param vendingMachine 设备管理
      * @return 设备管理集合
      */
     public List<VendingMachine> selectVendingMachineList(VendingMachine vendingMachine);
+
+    /**
+     * 根据设备编号查询设备信息
+     *
+     * @param innerCode
+     * @return VendingMachine
+     */
+    @Select("select * from tb_vending_machine where inner_code=#{innerCode}")
+    VendingMachine selectVendingMachineByInnerCode(@Param("innerCode") String innerCode);
 
     /**
      * 新增设备管理
